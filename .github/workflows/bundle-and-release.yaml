@@ -32,7 +32,7 @@ jobs:
         run: >-
           ./bundle.sh
 
-      - name: Create GitHub Release (without source files)
+      - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |-
