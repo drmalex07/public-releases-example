@@ -1,6 +1,10 @@
 {
+    "v0": {
+      "hello-private-octapus": "0.9.175",
+      "hello-octapus-scripts": "0.8.3"
+    },
     "v1.0": {
-      "hello-private-octapus": "1.0.1a"
+      "hello-private-octapus": "1.0.1a",
+      "hello-octapus-scripts": "1.0.2"
     }
-
 }
