@@ -1,0 +1,49 @@
+# This workflow reads a bundle.json file to get the correct source versions
+# for a release. It is triggered by a new tag being pushed to this repository.
+
+name: Release Bundler
+
+# The workflow is triggered when a tag is pushed to this repository.
+on: 
+  workflow_dispatch:
+  push:
+    tags:
+    - 'v*'
+
+jobs:
+  bundle-and-release:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write # needs write permission to create a release.
+
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Configure Git
+        run: |-
+          git config --global --add advice.detachedHead 'false'
+          echo "https://x-access-token:${PAT}@github.com" > ~/.git-credentials
+          git config --global credential.helper 'store --file ~/.git-credentials'
+        env:
+          PAT: ${{ secrets.PAT }}
+
+      - name: Bundle source repos
+        id: bundle
+        run: >-
+          ./bundle.sh
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Public Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: release-bundle.zip
+        #env:
+        #  GITHUB_TOKEN: ${{ secrets.PAT }}
+

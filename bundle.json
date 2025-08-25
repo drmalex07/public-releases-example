@@ -6,5 +6,9 @@
     "v1.0": {
       "hello-private-octapus": "1.0.1a",
       "hello-octapus-scripts": "1.0.2"
+    },
+    "main": {
+      "hello-private-octapus": "1.0.1a",
+      "hello-octapus-scripts": "1.0.2"
     }
 }
