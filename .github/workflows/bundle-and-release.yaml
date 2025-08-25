@@ -1,0 +1,77 @@
+# This workflow reads a bundle.json file to get the correct source versions
+# for a release. It is triggered by a new tag being pushed to this repository.
+
+name: Release Bundler
+
+# The workflow is triggered when a tag is pushed to this repository.
+on: 
+  workflow_dispatch:
+  push:
+    tags:
+    - 'v*'
+
+jobs:
+  bundle-and-release:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write # needs write permission to create a release.
+
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Set up variables from bundle.json
+        id: vars
+        run: |
+          # Get the tag that triggered the workflow
+          RELEASE_TAG="${{ github.ref_name }}"
+          echo "Processing release for tag: $RELEASE_TAG"
+
+          jq --arg ref ${RELEASE_TAG} '.[$ref]' bundle.json  
+
+          #echo "Tag for Repo A: $TAG_A"
+          #echo "Tag for Repo B: $TAG_B"
+          ## Export the variables so they can be used in subsequent steps
+          #echo "tag_A=$TAG_A" >> $GITHUB_OUTPUT
+          #echo "tag_B=$TAG_B" >> $GITHUB_OUTPUT
+
+#      - name: Checkout and archive Repo A
+#        uses: actions/checkout@v4
+#        with:
+#          repository: your-org/A
+#          ref: ${{ steps.vars.outputs.tag_A }}
+#          path: ./repo_A
+#          token: ${{ secrets.PAT }} # Personal Access Token with repo scope
+#
+#      - name: Checkout and archive Repo B
+#        uses: actions/checkout@v4
+#        with:
+#          repository: your-org/B
+#          ref: ${{ steps.vars.outputs.tag_B }}
+#          path: ./repo_B
+#          token: ${{ secrets.PAT }}
+#
+#      - name: Create release bundle
+#        run: |
+#          # Create a directory to hold the bundled files
+#          mkdir release-bundle
+#          # Copy the archived code from each repo into the bundle directory
+#          cp -r ./repo_A ./release-bundle/repo_A-${{ steps.vars.outputs.tag_A }}
+#          cp -r ./repo_B ./release-bundle/repo_B-${{ steps.vars.outputs.tag_B }}
+#          # Create the final zip archive of the bundled contents
+#          zip -r release-bundle.zip ./release-bundle -x "**.git/*"
+#
+#      - name: Create GitHub Release
+#        id: create_release
+#        uses: softprops/action-gh-release@v1
+#        with:
+#          tag_name: ${{ github.ref_name }}
+#          name: Public Release ${{ github.ref_name }}
+#          draft: false
+#          prerelease: false
+#          files: release-bundle.zip
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.PAT }}
+#
